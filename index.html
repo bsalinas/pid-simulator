@@ -14,7 +14,7 @@ layout: default
 			{% assign machine_id = forloop.index0 %}
 			{% for model in machine.models %}
 					{% assign model_id = forloop.index0 %}
-					<li><a href="{{machine['slug']}}/{{model['slug']}}.html">{{model.name}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
+					<li><a href="{{site.baseurl}}/{{machine['slug']}}/{{model['slug']}}.html">{{model.name}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
 				{% endfor %}
 		{% endfor %}
 		</ul>

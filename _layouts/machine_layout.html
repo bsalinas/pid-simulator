@@ -1,0 +1,50 @@
+---
+layout: default
+script: machine.js
+---
+<div data-role="page" id="machine">
+	<script>
+		function getModel(){
+			// console.log(JSON.parse({{page.model | jsonify }}))
+			return {{page.model | jsonify}};
+		}
+	</script>
+	<div data-role="header">
+		<a href="/">Back</a>
+		<h1>{{page.machine.name}} - {{page.model.name}}</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+		<form>
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<input type="radio" name="radio-scenario" id="radio-brewing" value="on" checked="checked">
+				<label for="radio-brewing">Brewing Coffee</label>
+				<input type="radio" name="radio-scenario" id="radio-cold" value="off">
+				<label for="radio-cold">Start From Cold</label>
+			</fieldset>
+		</form>
+		<div class="chart-wrapper">
+		</div>
+		<form>
+			<div data-role="fieldcontain">
+				<label for="slider-kp">Proportional:</label>
+				<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="5" step="0.1" value="3.8">
+			</div>
+			<div data-role="fieldcontain">
+				<label for="slider-kp">Integral:</label>
+				<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="1" step=".01" value="0.04">
+			</div>
+			<div data-role="fieldcontain">
+				<label for="slider-kp">Derivative:</label>
+				<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="15" step="0.5" value="10">
+			</div>
+		</form>
+		
+		
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h6><a href="http://luminairecoffee.com/">Made by Luminaire</a></h6>
+	</div><!-- /footer -->
+
+</div><!-- /page -->

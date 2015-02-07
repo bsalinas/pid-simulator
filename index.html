@@ -1,0 +1,26 @@
+---
+layout: default
+---
+<div data-role="page" id="selectMachine">
+
+	<div data-role="header">
+		<h1>Choose a Machine</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+		
+		<ul data-role="listview">
+		{% for machine in site.data.machines %}
+			{% assign machine_id = forloop.index0 %}
+			{% for model in machine.models %}
+					{% assign model_id = forloop.index0 %}
+					<li><a href="{{machine['slug']}}/{{model['slug']}}.html">{{model.name}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
+				{% endfor %}
+		{% endfor %}
+		</ul>
+	</div><!-- /content -->
+
+	<!-- <div data-role="footer">
+		<h4></h4>
+	</div>-->
+</div><!-- /page -->

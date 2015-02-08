@@ -61,6 +61,39 @@
 		</form> -->
 		<div class="chart-wrapper">
 		</div>
+		<div class="stats" data-role="controlgroup" data-type="horizontal">
+			<a href="#overlay-rise-time" data-rel="popup" id="riseTime" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
+				<div class="stat">12.0s</div>
+				<div class="stat-label">Rise Time</div></a>
+			<div id="overlay-rise-time" data-role="popup" data-overlay-theme="a" class="ui-content">
+				<p>Rise Time measures how quickly your espresso machine gets up to temperature. Typically you measure the time it takes to get to within 90% of the target temperature.</p>
+				<p>Bang Bang controllers usually have a lower rise time but take longer to achieve a stable temperature</p>
+			</div>
+			<a href="#overlay-peak-overshoot" data-rel="popup" id="overshoot" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
+				<div class="stat">18</div>
+				<div class="stat-label">Peak Overshoot</div></a>
+			<div id="overlay-peak-overshoot" data-role="popup" data-overlay-theme="a" class="ui-content">
+				<p>Peak Overshoot indicates how far above the target temperature the espresso machine heats up to. You want to minimize this measurement.</p>
+			</div>
+			<!-- <a href="#overlay-stability" data-rel="popup" id="stability" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
+				<div class="stat">12%</div>
+				<div class="stat-label">Stability</div></a>
+			<div id="overlay-stability" data-role="popup" data-overlay-theme="a" class="ui-content">
+				<p>We measure Stability by looking at the percentage of time that the boiler is within 0.5 degrees of its target, after its initial rise time.</p>
+			</div> -->
+			<a href="#overlay-finaltemp" data-rel="popup" id="finaltemp" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
+				<div class="stat">12%</div>
+				<div class="stat-label">Offset</div></a>
+			<div id="overlay-finaltemp" data-role="popup" data-overlay-theme="a" class="ui-content">
+				<p>The offset looks at the average temperature after the control system has stabilized and compares it to the target temperature.</p>
+			</div>
+			<a href="#overlay-settling" data-rel="popup" id="settling" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
+				<div class="stat">12%</div>
+				<div class="stat-label">Settingling Time</div></a>
+			<div id="overlay-settling" data-role="popup" data-overlay-theme="a" class="ui-content">
+				<p>Settingling time is how long it takes the control system to get and stay within 10% of the target</p>
+			</div>
+		</div>
 		<div data-role="tabs" id="controls">
 			<div data-role="navbar">
 				<ul>

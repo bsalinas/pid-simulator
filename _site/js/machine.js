@@ -8,7 +8,7 @@ $(document).on('pagecontainershow', function (e, ui){
 	$(ui.prevPage).remove();
 	if(ui.toPage[0].id !== "selectMachine"){
 		var shot = function(state, timestep){
-			return (-1/60.0)*timestep;
+			return (-2/60.0)*timestep;
 		};
 		brewing = new Simulator({time_step:1,sim_length:30*60, start_temperature:90}, [{start:30,stop:60,run:shot},{start:45,stop:75,run:shot}, {start:120,stop:150, run:shot},{start:300,stop:400, run:shot},{start:500,stop:700, run:shot}]);
 		startFromCold = new Simulator({time_step:1,sim_length:120*60, start_temperature:40}, []);
@@ -155,19 +155,79 @@ var run = function(e){
 	setupChart(data, currentScenario.events);
 	var kpis = calculateKPIs(data);
 	console.log(kpis);
+	if(typeof kpis.rise_time === 'string'){
+		$('#riseTime .stat').text(kpis.rise_time);	
+	}
+	else{
+		$('#riseTime .stat').text(kpis.rise_time+"s");	
+	}
+
+	if(typeof kpis.settling_time === 'string'){
+		$('#settling .stat').text(kpis.settling_time);	
+	}
+	else{
+		$('#settling .stat').text(parseFloat(Math.round(kpis.settling_time * 10) / 10).toFixed(1)+"s");
+	}
+	if(typeof kpis.offset === 'string'){
+		$('#finaltemp .stat').text(kpis.offset);
+	}
+	else{
+		$('#finaltemp .stat').html(parseFloat(Math.round(kpis.offset * 10) / 10).toFixed(1)+"&deg;C");	
+	}
+	
+	// $('#stability .stat').text(parseFloat(Math.round(kpis.stability * 10) / 10).toFixed(1)+"%");
+	
+	
+	$('#overshoot .stat').html(parseFloat(Math.round(kpis.peak_overshoot * 10) / 10).toFixed(1)+"&deg;C");
 }
 
 var calculateKPIs = function(data){
 	var i=0;
 	var riseTime = "Not Reached";
+	var hasReachedTemp = false;
+	var lastOutOfRange = "Not Reached";
+	var settling_time;
+	var avgTemp = 0.0;
+	var inRangeCount=0, outOfRangeCount = 0;
 	var max = 0;
-	var threshold = (currentScenario.target_temperature - currentScenario.start_temperature)*0.9 + currentScenario.start_temperature;
+	var threshold_min =  currentScenario.target_temperature - (currentScenario.target_temperature - currentScenario.start_temperature)*0.1;
+	var threshold_max = currentScenario.target_temperature + (currentScenario.target_temperature - currentScenario.start_temperature)*0.1;// + currentScenario.start_temperature;
+	console.log(threshold_min);
+	console.log(threshold_max);
 	for(i=0; i<data.length; i++){
-		if(data[i].temperature >= threshold){
-			riseTime = data[i].time;
-			break;
+		if(!hasReachedTemp){
+			if(data[i].temperature >= threshold_min){
+				riseTime = data[i].time;
+				hasReachedTemp = true;
+			}
+		} else {
+			if(Math.abs(data[i].temperature - currentScenario.target_temperature) < 0.5){
+				inRangeCount++;
+			}
+			else{
+				outOfRangeCount++;	
+			}
 		}
 	}
+	for(i=0; i<data.length; i++){
+		// console.log(data[i].temperature);
+		if(data[i].temperature <= threshold_min || data[i].temperature >= threshold_max){
+			lastOutOfRange = i;//data[i].time;
+		}
+	}
+	for(i=lastOutOfRange; i<data.length; i++){
+		avgTemp+= data[i].temperature;
+	}
+	if((data.length - lastOutOfRange)* currentScenario.time_step < 60){
+		avgTemp = "Unstable";
+		settling_time = "Unstable";
+
+	}
+	else{
+		avgTemp = (avgTemp / (data.length - lastOutOfRange)) - currentScenario.target_temperature;	
+		settling_time = data[lastOutOfRange].time;
+	}
+	
 
 	for(i=0; i<data.length; i++){
 		if(data[i].temperature > currentScenario.target_temperature){
@@ -182,7 +242,10 @@ var calculateKPIs = function(data){
 
 	return {
 		rise_time: riseTime,
-		peak_overshoot: max
+		peak_overshoot: max,
+		stability: 100*inRangeCount/(inRangeCount+outOfRangeCount),
+		settling_time: settling_time,
+		offset: avgTemp
 	};
 }
 

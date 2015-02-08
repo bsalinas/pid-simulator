@@ -3,38 +3,36 @@ var pid_controller = new PIDController(1,1,1);
 var currentScenario = false;
 var bang_bang_controller = new BangBangController();
 var currentController = bang_bang_controller;
-$(document).on('pagecontainershow', function (e, ui){
 
-	$(ui.prevPage).remove();
-	if(ui.toPage[0].id !== "selectMachine"){
-		var shot = function(state, timestep){
-			return (-2/60.0)*timestep;
-		};
-		brewing = new Simulator({time_step:1,sim_length:30*60, start_temperature:90}, [{start:30,stop:60,run:shot},{start:45,stop:75,run:shot}, {start:120,stop:150, run:shot},{start:300,stop:400, run:shot},{start:500,stop:700, run:shot}]);
-		startFromCold = new Simulator({time_step:1,sim_length:120*60, start_temperature:40}, []);
-		$(".pid-slider").on("slidestop", run);
-		$('#scenario a').click(function(e){
-			if($(this).attr('data-scenario') === 'brewing'){
-				currentScenario = brewing;
-			}
-			else{
-				currentScenario = startFromCold;
-			}
-			run();
-		});
-		$('#controls a').click(function(e){
-			console.log($(this).attr('data-controller'))
-			if($(this).attr('data-controller') == 'bang_bang'){
-				currentController = bang_bang_controller;
-			}
-			else{
-				currentController = pid_controller;
-			}
-			run();
-		});
-		$('#scenario li:first a').trigger('click');
-		// run();
-	}
+$(document).ready( function (e){
+
+	var shot = function(state, timestep){
+		return (-2/60.0)*timestep;
+	};
+	brewing = new Simulator({time_step:1,sim_length:30*60, start_temperature:90}, [{start:30,stop:60,run:shot},{start:45,stop:75,run:shot}, {start:120,stop:150, run:shot},{start:300,stop:400, run:shot},{start:500,stop:700, run:shot}]);
+	startFromCold = new Simulator({time_step:1,sim_length:120*60, start_temperature:40}, []);
+	$(".pid-slider").on("slidestop", run);
+	$('#scenario a').click(function(e){
+		if($(this).attr('data-scenario') === 'brewing'){
+			currentScenario = brewing;
+		}
+		else{
+			currentScenario = startFromCold;
+		}
+		run();
+	});
+	$('#controls a').click(function(e){
+		console.log($(this).attr('data-controller'))
+		if($(this).attr('data-controller') == 'bang_bang'){
+			currentController = bang_bang_controller;
+		}
+		else{
+			currentController = pid_controller;
+		}
+		run();
+	});
+	$('#scenario li:first a').trigger('click');
+	// run();
 	
 
 

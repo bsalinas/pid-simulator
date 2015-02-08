@@ -10,6 +10,8 @@
 				"boiler":{
 					"volume":5,
 					"power":1900.0,
+					"radius":0.0762,
+					"length":0.75
 				},
 				"groups":3
 			},
@@ -19,6 +21,8 @@
 				"boiler":{
 					"volume":3.4,
 					"power":1400.0,
+					"radius":0.0762,
+					"length":0.75
 				},
 				"groups":2
 			}
@@ -35,6 +39,8 @@
 				"boiler":{
 					"volume":3.0,
 					"power":1200.0,
+					"radius":0.0762,
+					"length":0.75
 				},
 				"groups":3
 			},
@@ -44,6 +50,8 @@
 				"boiler":{
 					"volume":2.0,
 					"power":1000.0,
+					"radius":0.0762,
+					"length":0.5
 				},
 				"groups":2
 			}
@@ -59,7 +67,9 @@
 				"slug":"silvia",
 				"boiler":{
 					"volume":0.3,
-					"power":1000
+					"power":1000,
+					"radius":0.0762,
+					"length":0.1
 				}
 			}
 		]

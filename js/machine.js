@@ -1,4 +1,8 @@
 var startFromCold, brewing;
+var pid_controller = new PIDController(1,1,1);
+var currentScenario = false;
+var bang_bang_controller = new BangBangController();
+var currentController = bang_bang_controller;
 $(document).on('pagecontainershow', function (e, ui){
 
 	$(ui.prevPage).remove();
@@ -6,11 +10,30 @@ $(document).on('pagecontainershow', function (e, ui){
 		var shot = function(state, timestep){
 			return (-1/60.0)*timestep;
 		};
-		brewing = new Simulator({time_step:10,sim_length:30*60, start_temperature:90}, [{start:30,stop:60,run:shot},{start:45,stop:75,run:shot}, {start:120,stop:150, run:shot},{start:300,stop:400, run:shot},{start:500,stop:700, run:shot}]);
-		startFromCold = new Simulator({time_step:10,sim_length:30*60, start_temperature:40}, []);
+		brewing = new Simulator({time_step:1,sim_length:30*60, start_temperature:90}, [{start:30,stop:60,run:shot},{start:45,stop:75,run:shot}, {start:120,stop:150, run:shot},{start:300,stop:400, run:shot},{start:500,stop:700, run:shot}]);
+		startFromCold = new Simulator({time_step:1,sim_length:120*60, start_temperature:40}, []);
 		$(".pid-slider").on("slidestop", run);
-		$('input[name="radio-scenario"]:radio').change(run);
-		run();
+		$('#scenario a').click(function(e){
+			if($(this).attr('data-scenario') === 'brewing'){
+				currentScenario = brewing;
+			}
+			else{
+				currentScenario = startFromCold;
+			}
+			run();
+		});
+		$('#controls a').click(function(e){
+			console.log($(this).attr('data-controller'))
+			if($(this).attr('data-controller') == 'bang_bang'){
+				currentController = bang_bang_controller;
+			}
+			else{
+				currentController = pid_controller;
+			}
+			run();
+		});
+		$('#scenario li:first a').trigger('click');
+		// run();
 	}
 	
 
@@ -86,9 +109,9 @@ function setupChart(data, events){
 	  svg.append("rect")
 	  	.attr('class','target')
 	  	.attr('x',x(0)+2)
-	  	.attr('y',y(96))
+	  	.attr('y',y(95.5))
 	  	.attr('width', (x(1800) - x(0)))
-	  	.attr('height', y(94)-y(96))
+	  	.attr('height', y(94.5)-y(95.5))
 
 	  
 
@@ -121,12 +144,46 @@ function getConstants(){
 }
 
 var run = function(e){
-	var scenario_selected = $('[name="radio-scenario"]:checked')[0].id === 'radio-brewing'? brewing : startFromCold;
 
 	var pid_constants = getConstants();
-	var data = scenario_selected.run(getModel()['boiler']['volume'],getModel()['boiler']['power'], pid_constants);
+	pid_controller.k_i = pid_constants.ki;
+	pid_controller.k_p = pid_constants.kp;
+	pid_controller.k_d = pid_constants.kd;
+	console.log(currentController);
+	var data = currentScenario.run(getModel()['boiler'], currentController, 30);
 	var i=0;
-	setupChart(data, scenario_selected.events);
+	setupChart(data, currentScenario.events);
+	var kpis = calculateKPIs(data);
+	console.log(kpis);
+}
+
+var calculateKPIs = function(data){
+	var i=0;
+	var riseTime = "Not Reached";
+	var max = 0;
+	var threshold = (currentScenario.target_temperature - currentScenario.start_temperature)*0.9 + currentScenario.start_temperature;
+	for(i=0; i<data.length; i++){
+		if(data[i].temperature >= threshold){
+			riseTime = data[i].time;
+			break;
+		}
+	}
+
+	for(i=0; i<data.length; i++){
+		if(data[i].temperature > currentScenario.target_temperature){
+			max = Math.max(max, data[i].temperature);	
+		}
+	}
+	if(max !== 0){
+		max = max - currentScenario.target_temperature;
+	}
+	
+	
+
+	return {
+		rise_time: riseTime,
+		peak_overshoot: max
+	};
 }
 
 

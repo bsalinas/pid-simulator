@@ -11,7 +11,7 @@ layout: default
 		
 		<ul data-role="listview">
 		{% for machine in site.machines %}
-			<li><a data-ajax="false" href="{{site.baseurl}}/{{machine.url}}">{{machine.family}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
+			<li><a data-ajax="false" href="{{site.baseurl}}{{machine.url}}">{{machine.family}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
 		{% endfor %}
 		</ul>
 	</div><!-- /content -->

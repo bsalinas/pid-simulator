@@ -10,12 +10,8 @@ layout: default
 	<div role="main" class="ui-content">
 		
 		<ul data-role="listview">
-		{% for machine in site.data.machines %}
-			{% assign machine_id = forloop.index0 %}
-			{% for model in machine.models %}
-					{% assign model_id = forloop.index0 %}
-					<li><a data-ajax="false" href="{{site.baseurl}}/{{machine['slug']}}/{{model['slug']}}.html">{{model.name}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
-				{% endfor %}
+		{% for machine in site.machines %}
+			<li><a data-ajax="false" href="{{site.baseurl}}/{{machine.url}}">{{machine.family}} {{machine.name}} <span class="lighter">({{machine.manufacturer}})</span></a></li>
 		{% endfor %}
 		</ul>
 	</div><!-- /content -->

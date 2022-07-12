@@ -6,7 +6,16 @@ script: machine.js
 	<script>
 		function getModel(){
 			// console.log(JSON.parse({{page.model | jsonify }}))
-			return {{page.model | jsonify}};
+            return {
+                "name":"{{page.name}}",
+                "boiler":{
+                    "volume":{{page.boiler_volume}},
+                    "power":{{page.boiler_power}},
+                    "radius":{{page.boiler_radius}},
+                    "length":{{page.boiler_length}}
+                },
+                "groups":{{page.groups}}
+            }
 		}
 	</script>
 	<div data-role="header">

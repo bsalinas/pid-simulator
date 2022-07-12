@@ -8,5 +8,8 @@ url: "http://bsalinas.com" # the base hostname & protocol for your site
 twitter_username: jekyllrb
 github_username:  jekyll
 
+collections:
+  machines:
+    output: true
 # Build settings
 markdown: kramdown

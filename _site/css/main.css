@@ -1,0 +1,19 @@
+.lighter { color: #AAA; font-weight: 200; }
+
+.chart-wrapper { width: 100%; height: calc(100% - 250px); }
+
+.chart-wrapper svg.chart { width: 100%; height: calc(100% - 250px); }
+
+.chart-wrapper .target { fill: #9CF2BB; }
+
+.chart-wrapper .shot { fill: rgba(0, 0, 255, 0.15); }
+
+.chart-wrapper .axis path, .chart-wrapper .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+
+.chart-wrapper .x.axis path { display: none; }
+
+.chart-wrapper .line { fill: none; stroke: steelblue; stroke-width: 1.5px; }
+
+.stats .stat-label { font-size: 12px; font-weight: 200; }
+
+/*# sourceMappingURL=main.css.map */

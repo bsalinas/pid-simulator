@@ -1,0 +1,257 @@
+var startFromCold, brewing;
+var TIME_STEP = 0.1
+var pid_controller = new PIDController(1,1,1, TIME_STEP);
+var currentScenario = false;
+var bang_bang_controller = new BangBangController();
+var currentController = bang_bang_controller;
+
+$(document).ready( function (e){
+
+	var shot = function(state, timestep){
+		return (-2/60.0)*timestep;
+	};
+	brewing = new Simulator({time_step:TIME_STEP,sim_length:30*60, start_temperature:94}, [{start:80,stop:110,run:shot},{start:95,stop:125,run:shot}, {start:150,stop:180, run:shot},{start:330,stop:430, run:shot},{start:530,stop:730, run:shot}]);
+	startFromCold = new Simulator({time_step:TIME_STEP,sim_length:60*60, start_temperature:90}, []);
+	
+	$('#scenario a').click(function(e){
+		if($(this).attr('data-scenario') === 'brewing'){
+			currentScenario = brewing;
+		}
+		else{
+			currentScenario = startFromCold;
+		}
+        // $(".pid-slider").on("change", run);
+		run();
+	});
+	$('#controls a').click(function(e){
+		console.log($(this).attr('data-controller'))
+		if($(this).attr('data-controller') == 'bang_bang'){
+			currentController = bang_bang_controller;
+		}
+		else{
+			currentController = pid_controller;
+		}
+        // $(".pid-slider").on("change", run);
+		run();
+	});
+	$('#scenario li:first a').trigger('click');
+    $(".pid-slider").on("change", run);
+	// run();
+	
+
+
+});
+var svg, line;
+
+function setupChart(data, events){
+
+	var margin = {top: 20, right: 20, bottom: 30, left: 50};
+	$('svg.chart').remove();
+	svg = d3.select(".chart-wrapper").append('svg').attr('class','chart')
+		.append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    // .attr("width", width + margin.left + margin.right)
+	    // .attr("height", height + margin.top + margin.bottom)
+	  
+
+
+	var width = $('svg.chart').width() - margin.left - margin.right,
+	    height = $('svg.chart').height() - margin.top - margin.bottom;
+
+
+	var x = d3.scale.linear()
+	    .range([0, width]);
+
+	var y = d3.scale.linear()
+	    .range([height, 0]);
+
+	var xAxis = d3.svg.axis().ticks(5)
+	    .scale(x)
+	    .orient("bottom");
+
+	var yAxis = d3.svg.axis().ticks(3)
+	    .scale(y)
+	    .orient("left");
+
+	line = d3.svg.line()
+	    .x(function(d) { return x(d.time/60); })
+	    .y(function(d) {return y(d.temperature); });
+	  var y_extent = d3.extent(data, function(d){return d.temperature;})
+	  x.domain(d3.extent(data, function(d){return d.time/60;}));
+	  y.domain([Math.min(y_extent[0],92), Math.max(y_extent[1],97)]);
+	  console.log(x);
+
+	  svg.selectAll('rect.shot').data(events)
+	  	.enter().append('rect')
+	  	.attr("class","shot")
+	  	.attr('x',function(d){
+	  		console.log(d);
+	  		return x(d.start/60)
+	  	})
+	  	.attr('y',y(y.domain()[1]))
+	  	.attr('width',function(d){
+	  		return x(d.stop/60)-x(d.start/60);
+	  	})
+	  	.attr('height',y(y.domain()[0]) - y(y.domain()[1]));
+
+	  svg.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis);
+
+	  svg.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 3)
+	      .attr("dy", "-2.5em")
+	      .style("text-anchor", "end")
+	      .text("Temperature");
+	  svg.append("rect")
+	  	.attr('class','target')
+	  	.attr('x',x(0)+2)
+	  	.attr('y',y(95.5))
+	  	.attr('width', (x(1800) - x(0)))
+	  	.attr('height', y(94.5)-y(95.5))
+
+	  
+
+	var pathTween = function() {
+        var interpolate = d3.scale.quantile()
+                .domain([0,1])
+                .range(d3.range(1, data.length + 1));
+        return function(t) {
+            return line(data.slice(0, interpolate(t)));
+        };
+    }
+	  svg.selectAll('path.line').data([data]).enter()
+	    .append("path")
+	    .attr("class", "line")
+	    .attr("d", line(data[0]))
+	    .transition().duration(1000).attrTween('d',pathTween);
+	    
+    
+    
+
+}
+
+
+function getConstants(){
+	return {
+		kp: $('[name="slider-kp"]').val(),
+		ki: $('[name="slider-ki"]').val(),
+		kd: $('[name="slider-kd"]').val()
+	}
+}
+
+var run = function(e){
+    console.log("RUN!");
+	var pid_constants = getConstants();
+	pid_controller.k_i = pid_constants.ki;
+	pid_controller.k_p = pid_constants.kp;
+	pid_controller.k_d = pid_constants.kd;
+	console.log(currentController);
+	var data = currentScenario.run(getModel()['boiler'], currentController, TIME_STEP);//XXX this is wrong
+	var i=0;
+	setupChart(data, currentScenario.events);
+	var kpis = calculateKPIs(data);
+	console.log(kpis);
+	if(typeof kpis.rise_time === 'string'){
+		$('#riseTime .stat').text(kpis.rise_time);	
+	}
+	else{
+		$('#riseTime .stat').text(kpis.rise_time+"s");	
+	}
+
+	if(typeof kpis.settling_time === 'string'){
+		$('#settling .stat').text(kpis.settling_time);	
+	}
+	else{
+		$('#settling .stat').text(parseFloat(Math.round(kpis.settling_time * 10) / 10).toFixed(1)+"s");
+	}
+	if(typeof kpis.offset === 'string'){
+		$('#finaltemp .stat').text(kpis.offset);
+	}
+	else{
+		$('#finaltemp .stat').html(parseFloat(Math.round(kpis.offset * 10) / 10).toFixed(1)+"&deg;C");	
+	}
+	
+	// $('#stability .stat').text(parseFloat(Math.round(kpis.stability * 10) / 10).toFixed(1)+"%");
+	
+	
+	$('#overshoot .stat').html(parseFloat(Math.round(kpis.peak_overshoot * 10) / 10).toFixed(1)+"&deg;C");
+}
+
+var calculateKPIs = function(data){
+	var i=0;
+	var riseTime = "Not Reached";
+	var hasReachedTemp = false;
+	var lastOutOfRange = "Not Reached";
+	var settling_time;
+	var avgTemp = 0.0;
+	var inRangeCount=0, outOfRangeCount = 0;
+	var max = 0;
+	var threshold_min =  currentScenario.target_temperature - (currentScenario.target_temperature - currentScenario.start_temperature)*0.2;
+	var threshold_max = currentScenario.target_temperature + (currentScenario.target_temperature - currentScenario.start_temperature)*0.2;// + currentScenario.start_temperature;
+	console.log(threshold_min);
+	console.log(threshold_max);
+	for(i=0; i<data.length; i++){
+		if(!hasReachedTemp){
+			if(data[i].temperature >= threshold_min){
+				riseTime = data[i].time;
+				hasReachedTemp = true;
+			}
+		} else {
+			if(Math.abs(data[i].temperature - currentScenario.target_temperature) < 2.5){
+				inRangeCount++;
+			}
+			else{
+				outOfRangeCount++;	
+			}
+		}
+	}
+	for(i=0; i<data.length; i++){
+		// console.log(data[i].temperature);
+		if(data[i].temperature <= threshold_min || data[i].temperature >= threshold_max){
+			lastOutOfRange = i;//data[i].time;
+		}
+	}
+	for(i=lastOutOfRange; i<data.length; i++){
+		avgTemp+= data[i].temperature;
+	}
+	if((data.length - lastOutOfRange)* currentScenario.time_step < 60){
+		avgTemp = "Unstable";
+		settling_time = "Unstable";
+
+	}
+	else{
+		avgTemp = (avgTemp / (data.length - lastOutOfRange)) - currentScenario.target_temperature;	
+		settling_time = data[lastOutOfRange].time;
+	}
+	
+
+	for(i=0; i<data.length; i++){
+		if(data[i].temperature > currentScenario.target_temperature){
+			max = Math.max(max, data[i].temperature);	
+		}
+	}
+	if(max !== 0){
+		max = max - currentScenario.target_temperature;
+	}
+	
+	
+
+	return {
+		rise_time: riseTime,
+		peak_overshoot: max,
+		stability: 100*inRangeCount/(inRangeCount+outOfRangeCount),
+		settling_time: settling_time,
+		offset: avgTemp
+	};
+}
+
+
+
+var step_size = 0.1;//seconds
+var time_length = 30*60;//seconds

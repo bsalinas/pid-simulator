@@ -1,0 +1,77 @@
+[
+	{
+		"name":"Linea PB",
+		"slug":"linea_pb",
+		"manufacturer":"La Marzocco",
+		"models":[
+			{
+				"name": "3 Group",
+				"slug":"3_group",
+				"boiler":{
+					"volume":5,
+					"power":1900.0,
+					"radius":0.0762,
+					"length":0.75
+				},
+				"groups":3
+			},
+			{
+				"name": "2 Group",
+				"slug":"2_group",
+				"boiler":{
+					"volume":3.4,
+					"power":1400.0,
+					"radius":0.0762,
+					"length":0.75
+				},
+				"groups":2
+			}
+		]
+	},
+	{
+		"name":"GB/5",
+		"slug":"gb_5",
+		"manufacturer":"La Marzocco",
+		"models":[
+			{
+				"name": "3 Group",
+				"slug":"3_group",
+				"boiler":{
+					"volume":3.0,
+					"power":1200.0,
+					"radius":0.0762,
+					"length":0.75
+				},
+				"groups":3
+			},
+			{
+				"name": "2 Group",
+				"slug":"2_group",
+				"boiler":{
+					"volume":2.0,
+					"power":1000.0,
+					"radius":0.0762,
+					"length":0.5
+				},
+				"groups":2
+			}
+		]
+	},
+	{
+		"name":"Silvia",
+		"slug":"silvia",
+		"manufacturer":"Rancilio",
+		"models":[
+			{
+				"name":"",
+				"slug":"silvia",
+				"boiler":{
+					"volume":0.3,
+					"power":1000,
+					"radius":0.0762,
+					"length":0.1
+				}
+			}
+		]
+	}
+]

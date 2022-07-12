@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"file": "main.css",
+	"sources": [
+		"main.scss",
+		"_sass/_base.scss"
+	],
+	"sourcesContent": [
+		"// Import partials from `sass_dir` (defaults to `_sass`)\n@import\n        \"base\"\n;\n",
+		"\n.lighter{\n\tcolor:#AAA;\n\tfont-weight:200;\n}\n.chart-wrapper{\n\twidth:100%;\n\theight:calc(100% - 250px);\n\tsvg.chart{\n\t\twidth:100%;\n\t\theight:calc(100% - 250px);\n\t}\n\t.target{\n\t\tfill:#9CF2BB;\n\t}\n\t.shot{\n\t\tfill:rgba(0,0,255,0.15);\n\t}\n\n\t.axis path,\n\t.axis line {\n\t  fill: none;\n\t  stroke: #000;\n\t  shape-rendering: crispEdges;\n\t}\n\n\t.x.axis path {\n\t  display: none;\n\t}\n\n\t.line {\n\t  fill: none;\n\t  stroke: steelblue;\n\t  stroke-width: 1.5px;\n\t}\n}\n.stats{\n\t.stat-label{\n\t\tfont-size:12px;\n\t\tfont-weight:200;\n\t}\n\n}"
+	],
+	"names": [],
+	"mappings": "ACCA,AAAA,QAAQ,CAAA,EACP,KAAK,EAAC,IAAI,EACV,WAAW,EAAC,GAAG,GACf;;AACD,AAAA,cAAc,CAAA,EACb,KAAK,EAAC,IAAI,EACV,MAAM,EAAC,kBAAkB,GA4BzB;;AA9BD,AAGC,cAHa,CAGb,GAAG,AAAA,MAAM,CAAA,EACR,KAAK,EAAC,IAAI,EACV,MAAM,EAAC,kBAAkB,GACzB;;AANF,AAOC,cAPa,CAOb,OAAO,CAAA,EACN,IAAI,EAAC,OAAO,GACZ;;AATF,AAUC,cAVa,CAUb,KAAK,CAAA,EACJ,IAAI,EAAC,qBAAkB,GACvB;;AAZF,AAcC,cAda,CAcb,KAAK,CAAC,IAAI,EAdX,cAAc,CAeb,KAAK,CAAC,IAAI,CAAC,EACT,IAAI,EAAE,IAAI,EACV,MAAM,EAAE,IAAI,EACZ,eAAe,EAAE,UAAU,GAC5B;;AAnBF,AAqBC,cArBa,CAqBb,EAAE,AAAA,KAAK,CAAC,IAAI,CAAC,EACX,OAAO,EAAE,IAAI,GACd;;AAvBF,AAyBC,cAzBa,CAyBb,KAAK,CAAC,EACJ,IAAI,EAAE,IAAI,EACV,MAAM,EAAE,SAAS,EACjB,YAAY,EAAE,KAAK,GACpB;;AAEF,AACC,MADK,CACL,WAAW,CAAA,EACV,SAAS,EAAC,IAAI,EACd,WAAW,EAAC,GAAG,GACf"
+}

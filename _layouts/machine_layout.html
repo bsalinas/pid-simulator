@@ -20,7 +20,7 @@ script: machine.js
 	</script>
 	<div data-role="header">
 		<a data-ajax="false" href="{{site.baseurl}}/">Back</a>
-		<h1>{{page.machine.name}} - {{page.model.name}}</h1>
+		<h1>{{page.family}} - {{page.name}}</h1>
 		<div data-role="navbar">
 			<ul id="scenario">
 				<li><a data-scenario="brewing" href="#">Brewing Coffee</a></li>
@@ -109,6 +109,7 @@ script: machine.js
 
 	<div data-role="footer">
 		<h6><a href="http://luminairecoffee.com/">Made by Luminaire</a></h6>
+        <!-- <h6><a id="deep_link" href="{{site.baseurl}}{{page.url}}">Link to This Page</a></h6> -->
 	</div><!-- /footer -->
 
 </div><!-- /page -->

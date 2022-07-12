@@ -5,6 +5,37 @@ var currentScenario = false;
 var bang_bang_controller = new BangBangController();
 var currentController = bang_bang_controller;
 
+function parseQueryString(params)
+{
+    console.log("parseQueryString")
+    console.log(params)
+    if(params["sim"])
+    {
+        $('[data-scenario="'+params["sim"]+'"]').trigger('click');
+    } else
+    {
+        $('#scenario li:first a').trigger('click');
+    }
+    if(params["ctrl"])
+    {
+        $('[data-controller="'+params["ctrl"]+'"]').trigger('click');
+    } else
+    {
+        $('[data-controller="bang_bang"]').trigger('click');
+    }
+    if(params["kp"])
+    {
+        $('[name="slider-kp"]').val(params["kp"])
+    }
+    if(params["ki"])
+    {
+        $('[name="slider-ki"]').val(params["ki"])
+    }
+    if(params["kd"])
+    {
+        $('[name="slider-kd"]').val(params["kd"])
+    }
+}
 $(document).ready( function (e){
 
 	var shot = function(state, timestep){
@@ -34,11 +65,12 @@ $(document).ready( function (e){
         // $(".pid-slider").on("change", run);
 		run();
 	});
-	$('#scenario li:first a').trigger('click');
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    parseQueryString(params);
+	// $('#scenario li:first a').trigger('click');
     $(".pid-slider").on("change", run);
-	// run();
-	
-
+	run();
 
 });
 var svg, line;
@@ -144,19 +176,41 @@ function getConstants(){
 		kd: $('[name="slider-kd"]').val()
 	}
 }
-
+function generateQueryString()
+{
+    console.log("generateQueryString")
+    let ctrl = $("[data-controller].ui-btn-active").attr("data-controller")
+    let sim = $("[data-scenario].ui-btn-active").attr("data-scenario")
+    let params = {
+        "ctrl":ctrl,
+        "sim":sim
+    }
+    if(sim == "pid")
+    {
+        params["kp"] = $('[name="slider-kp"]').val()
+        params["ki"] = $('[name="slider-ki"]').val()
+        params["kd"] = $('[name="slider-kd"]').val()
+    }
+    let queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + queryString;
+    console.log(queryString)
+    // window.history.replaceState(null,null,"?"+queryString)
+    // window.history.replaceState(null,null,newurl);
+    $('#deep_link').attr("href",newurl);
+}
 var run = function(e){
     console.log("RUN!");
 	var pid_constants = getConstants();
 	pid_controller.k_i = pid_constants.ki;
 	pid_controller.k_p = pid_constants.kp;
 	pid_controller.k_d = pid_constants.kd;
-	console.log(currentController);
+	// console.log(currentController);
 	var data = currentScenario.run(getModel()['boiler'], currentController, TIME_STEP);//XXX this is wrong
+    // generateQueryString();
 	var i=0;
 	setupChart(data, currentScenario.events);
 	var kpis = calculateKPIs(data);
-	console.log(kpis);
+	// console.log(kpis);
 	if(typeof kpis.rise_time === 'string'){
 		$('#riseTime .stat').text(kpis.rise_time);	
 	}

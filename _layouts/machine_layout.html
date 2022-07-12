@@ -80,15 +80,15 @@ script: machine.js
 				<form>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Proportional:</label>
-						<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="5" step="0.1" value="3.8">
+						<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="50" step="0.01" value="0.1">
 					</div>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Integral:</label>
-						<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="1" step=".01" value="0.04">
+						<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="10" step=".0001" value="0.0">
 					</div>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Derivative:</label>
-						<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="15" step="0.5" value="10">
+						<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="50" step="0.5" value="0">
 					</div>
 				</form>
 			</div>

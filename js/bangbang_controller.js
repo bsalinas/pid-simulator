@@ -6,6 +6,10 @@ BangBangController.prototype.setTarget = function(target) {
   this.target = target;
 };
 
+BangBangController.prototype.reset = function()
+{
+    
+}
 BangBangController.prototype.update = function(current_value) {
   this.current_value = current_value;
 

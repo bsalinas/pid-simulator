@@ -1,5 +1,6 @@
 var startFromCold, brewing;
-var pid_controller = new PIDController(1,1,1);
+var TIME_STEP = 0.1
+var pid_controller = new PIDController(1,1,1, TIME_STEP);
 var currentScenario = false;
 var bang_bang_controller = new BangBangController();
 var currentController = bang_bang_controller;
@@ -9,9 +10,9 @@ $(document).ready( function (e){
 	var shot = function(state, timestep){
 		return (-2/60.0)*timestep;
 	};
-	brewing = new Simulator({time_step:1,sim_length:30*60, start_temperature:90}, [{start:30,stop:60,run:shot},{start:45,stop:75,run:shot}, {start:120,stop:150, run:shot},{start:300,stop:400, run:shot},{start:500,stop:700, run:shot}]);
-	startFromCold = new Simulator({time_step:1,sim_length:120*60, start_temperature:40}, []);
-	$(".pid-slider").on("slidestop", run);
+	brewing = new Simulator({time_step:TIME_STEP,sim_length:30*60, start_temperature:94}, [{start:80,stop:110,run:shot},{start:95,stop:125,run:shot}, {start:150,stop:180, run:shot},{start:330,stop:430, run:shot},{start:530,stop:730, run:shot}]);
+	startFromCold = new Simulator({time_step:TIME_STEP,sim_length:60*60, start_temperature:90}, []);
+	
 	$('#scenario a').click(function(e){
 		if($(this).attr('data-scenario') === 'brewing'){
 			currentScenario = brewing;
@@ -19,6 +20,7 @@ $(document).ready( function (e){
 		else{
 			currentScenario = startFromCold;
 		}
+        // $(".pid-slider").on("change", run);
 		run();
 	});
 	$('#controls a').click(function(e){
@@ -29,9 +31,11 @@ $(document).ready( function (e){
 		else{
 			currentController = pid_controller;
 		}
+        // $(".pid-slider").on("change", run);
 		run();
 	});
 	$('#scenario li:first a').trigger('click');
+    $(".pid-slider").on("change", run);
 	// run();
 	
 
@@ -74,7 +78,7 @@ function setupChart(data, events){
 	    .y(function(d) {return y(d.temperature); });
 	  var y_extent = d3.extent(data, function(d){return d.temperature;})
 	  x.domain(d3.extent(data, function(d){return d.time/60;}));
-	  y.domain([Math.min(y_extent[0],85), Math.max(y_extent[1],100)]);
+	  y.domain([Math.min(y_extent[0],92), Math.max(y_extent[1],97)]);
 	  console.log(x);
 
 	  svg.selectAll('rect.shot').data(events)
@@ -142,13 +146,13 @@ function getConstants(){
 }
 
 var run = function(e){
-
+    console.log("RUN!");
 	var pid_constants = getConstants();
 	pid_controller.k_i = pid_constants.ki;
 	pid_controller.k_p = pid_constants.kp;
 	pid_controller.k_d = pid_constants.kd;
 	console.log(currentController);
-	var data = currentScenario.run(getModel()['boiler'], currentController, 30);
+	var data = currentScenario.run(getModel()['boiler'], currentController, TIME_STEP);//XXX this is wrong
 	var i=0;
 	setupChart(data, currentScenario.events);
 	var kpis = calculateKPIs(data);
@@ -188,8 +192,8 @@ var calculateKPIs = function(data){
 	var avgTemp = 0.0;
 	var inRangeCount=0, outOfRangeCount = 0;
 	var max = 0;
-	var threshold_min =  currentScenario.target_temperature - (currentScenario.target_temperature - currentScenario.start_temperature)*0.1;
-	var threshold_max = currentScenario.target_temperature + (currentScenario.target_temperature - currentScenario.start_temperature)*0.1;// + currentScenario.start_temperature;
+	var threshold_min =  currentScenario.target_temperature - (currentScenario.target_temperature - currentScenario.start_temperature)*0.2;
+	var threshold_max = currentScenario.target_temperature + (currentScenario.target_temperature - currentScenario.start_temperature)*0.2;// + currentScenario.start_temperature;
 	console.log(threshold_min);
 	console.log(threshold_max);
 	for(i=0; i<data.length; i++){
@@ -199,7 +203,7 @@ var calculateKPIs = function(data){
 				hasReachedTemp = true;
 			}
 		} else {
-			if(Math.abs(data[i].temperature - currentScenario.target_temperature) < 0.5){
+			if(Math.abs(data[i].temperature - currentScenario.target_temperature) < 2.5){
 				inRangeCount++;
 			}
 			else{
@@ -249,5 +253,5 @@ var calculateKPIs = function(data){
 
 
 
-var step_size = 10;//seconds
+var step_size = 0.1;//seconds
 var time_length = 30*60;//seconds

@@ -44,7 +44,7 @@ function setupChart(data){
 	    .y(function(d) {return y(d.temperature); });
 
 	  x.domain(d3.extent(data, function(d){return d.time/60;}));
-	  y.domain([85,100]);
+	  y.domain([90,100]);
 
 	  svg.append("g")
 	      .attr("class", "x axis")
@@ -110,7 +110,7 @@ function runSim(boiler_size, heater_size, pid_constants){
 	var slope = 0.0;
 	var target = 95;
 	var state = {
-		temperature: 75.0,
+		temperature: 95.0,
 		time: 0.0
 	};
 	var last_error = 0.0;

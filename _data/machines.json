@@ -1,8 +1,8 @@
 [
 	{
-		"name":"Linea PB",
-		"slug":"linea_pb",
-		"manufacturer":"La Marzocco",
+		"name":"Big Machine",
+		"slug":"big",
+		"manufacturer":"Professional",
 		"models":[
 			{
 				"name": "3 Group",
@@ -28,49 +28,38 @@
 			}
 		]
 	},
+    {
+        "name":"Overpowered Boiler",
+        "slug":"big",
+        "manufacturer":"Professional",
+        "models":[
+            {
+                "name": "1 Group",
+                "slug":"1_group",
+                "boiler":{
+                    "volume":1.5,
+                    "power":3000.0,
+                    "radius":0.0762,
+                    "length":0.75
+                },
+                "groups":1
+            }
+        ]
+    },
 	{
-		"name":"GB/5",
-		"slug":"gb_5",
-		"manufacturer":"La Marzocco",
-		"models":[
-			{
-				"name": "3 Group",
-				"slug":"3_group",
-				"boiler":{
-					"volume":3.0,
-					"power":1200.0,
-					"radius":0.0762,
-					"length":0.75
-				},
-				"groups":3
-			},
-			{
-				"name": "2 Group",
-				"slug":"2_group",
-				"boiler":{
-					"volume":2.0,
-					"power":1000.0,
-					"radius":0.0762,
-					"length":0.5
-				},
-				"groups":2
-			}
-		]
-	},
-	{
-		"name":"Silvia",
-		"slug":"silvia",
-		"manufacturer":"Rancilio",
+		"name":"Small Machine",
+		"slug":"small",
+		"manufacturer":"Professional",
 		"models":[
 			{
 				"name":"",
-				"slug":"silvia",
-				"boiler":{
-					"volume":0.3,
-					"power":1000,
-					"radius":0.0762,
-					"length":0.1
-				}
+                "slug":"silvia",
+                "boiler":{
+                    "volume":0.3,
+                    "power":1000,
+                    "radius":0.0762,
+                    "length":0.1
+                }
 			}
 		]
 	}

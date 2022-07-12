@@ -12,6 +12,13 @@ window.Simulator = function(opts, events){
 	this.events = events;
 	this.last_controls_time = 0;
 	this.last_heater_duty_cycle = 0;
+    this.heater_duty_cycle_pending = []
+    // let n_delay = parseInt(1.0/this.time_step)
+    let n_delay = 100
+    for(let i=0; i<n_delay; i++)
+    {
+        this.heater_duty_cycle_pending.push(0.0)
+    }
 
 	return this
 };
@@ -19,6 +26,7 @@ window.Simulator = function(opts, events){
 Simulator.prototype.run= function(boiler, ctrl, controls_time_step){
 	var boiler_size = boiler['volume'];
 	var heater_size = boiler['power'];
+    ctrl.reset();
 	var surface_area = 2*3.14159*boiler['radius']*boiler['length'] + 2*3.14159*Math.pow(boiler['radius'],2);
 	var h = 7.9;//(W/m^2 K)
 	// var ctrl = new Controller(pid_constants.kp, pid_constants.ki, pid_constants.kd);
@@ -36,9 +44,14 @@ Simulator.prototype.run= function(boiler, ctrl, controls_time_step){
 		// c = 4.186 Joules/ gram
 		// Q = duty * heater_watts * timestep(s) (should be in joules)
 		if(this.state.time == 0 || (this.state.time - this.last_controls_time) >= controls_time_step){
-			this.last_heater_duty_cycle = ctrl.update(this.state.temperature);
-			this.last_heater_duty_cycle = Math.max(0,this.last_heater_duty_cycle);
-			this.last_heater_duty_cycle = Math.min(1,this.last_heater_duty_cycle);
+            let new_duty_cycle = ctrl.update(this.state.temperature);
+            new_duty_cycle = Math.max(0,new_duty_cycle);
+            new_duty_cycle = Math.min(1,new_duty_cycle);
+            this.last_heater_duty_cycle = this.heater_duty_cycle_pending.shift()
+            this.heater_duty_cycle_pending.push(new_duty_cycle);
+			// this.last_heater_duty_cycle = 
+			// this.last_heater_duty_cycle = Math.max(0,this.last_heater_duty_cycle);
+			// this.last_heater_duty_cycle = Math.min(1,this.last_heater_duty_cycle);
 			this.last_controls_time = this.state.time;
 		}
 		

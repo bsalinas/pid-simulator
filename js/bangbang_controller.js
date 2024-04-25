@@ -2,7 +2,7 @@
 window.BangBangController = function() {
   this.target    = 0; // default value, can be modified with .setTarget
   this.hysteresis = 0.0;
-  this.last_was_on = false;
+  this.last_was_on = true;
 };
 
 BangBangController.prototype.setTarget = function(target) {
@@ -37,11 +37,14 @@ BangBangController.prototype.update = function(current_value) {
   {
     
 
-    if(this.current_value < this.target){
+    if(this.current_value < this.target)
+    {
       this.last_was_on = true;
       return 1.0;
+    } else
+    {
+      this.last_was_on = false;
+      return 0.0;
     }
-    this.last_was_on = false;
-    return 0.0;
   }
 };

@@ -35,16 +35,32 @@ function parseQueryString(params)
     {
         $('[name="slider-kd"]').val(params["kd"])
     }
+    if(params["room_temp"])
+    {
+    	$('[name="slider-room-temp"]').val(params["room_temp"]);
+    }
+    if(params["hyst"])
+    {
+    	$('[name="slider-hyst"]').val(params["hyst"]);
+    }
+    if(params["power"])
+    {
+    	$('[name="slider-power"]').val(params["power"]);
+    }
+    if(params["volume"])
+    {
+    	$('[name="slider-volume"]').val(params["volume"]);
+    }
 }
 $(document).ready( function (e){
 
 	var shot = function(state, timestep){
 		return (-2/60.0)*timestep;
 	};
-	brewing = new Simulator({time_step:TIME_STEP,sim_length:30*60, start_temperature:94}, [{start:80,stop:110,run:shot},{start:95,stop:125,run:shot}, {start:150,stop:180, run:shot},{start:330,stop:430, run:shot},{start:530,stop:730, run:shot}]);
-	startFromCold = new Simulator({time_step:TIME_STEP,sim_length:60*60, start_temperature:90}, []);
+	brewing = new Simulator({room_temperature:getRoomTemp(), time_step:TIME_STEP,sim_length:30*60, start_temperature:94}, [{start:80,stop:110,run:shot},{start:95,stop:125,run:shot}, {start:150,stop:180, run:shot},{start:330,stop:430, run:shot},{start:530,stop:730, run:shot}]);
+	startFromCold = new Simulator({room_temperature:getRoomTemp(), time_step:TIME_STEP,sim_length:60*60, start_temperature:85}, []);
 	
-	$('#scenario a').click(function(e){
+	$('a[data-scenario]').click(function(e){
 		if($(this).attr('data-scenario') === 'brewing'){
 			currentScenario = brewing;
 		}
@@ -54,8 +70,9 @@ $(document).ready( function (e){
         // $(".pid-slider").on("change", run);
 		run();
 	});
-	$('#controls a').click(function(e){
+	$('a[data-controller]').click(function(e){
 		console.log($(this).attr('data-controller'))
+		console.log("Clicked on Controller");
 		if($(this).attr('data-controller') == 'bang_bang'){
 			currentController = bang_bang_controller;
 		}
@@ -67,9 +84,15 @@ $(document).ready( function (e){
 	});
     const urlSearchParams = new URLSearchParams(window.location.search);
     const params = Object.fromEntries(urlSearchParams.entries());
+
+    console.log(getModel())
+    $('[name="slider-volume"]').val(getModel()["boiler"]["volume"])
+    $('[name="slider-power"]').val(getModel()["boiler"]["power"])
     parseQueryString(params);
 	// $('#scenario li:first a').trigger('click');
+
     $(".pid-slider").on("change", run);
+    // $(".param-slider").on("change", run);
 	run();
 
 });
@@ -176,6 +199,18 @@ function getConstants(){
 		kd: $('[name="slider-kd"]').val()
 	}
 }
+function getRoomTemp(){
+	return parseFloat($('[name="slider-room-temp"]').val());
+}
+function getHysteresis(){
+	return parseFloat($('[name="slider-hyst"]').val());
+}
+function getPower(){
+	return parseFloat($('[name="slider-power"]').val());
+}
+function getVolume(){
+	return parseFloat($('[name="slider-volume"]').val());
+}
 function generateQueryString()
 {
     console.log("generateQueryString")
@@ -183,14 +218,21 @@ function generateQueryString()
     let sim = $("[data-scenario].ui-btn-active").attr("data-scenario")
     let params = {
         "ctrl":ctrl,
-        "sim":sim
+        "sim":sim,
+        "room_temp":getRoomTemp(),
+        "volume":getVolume(),
+        "power":getPower()
     }
     if(sim == "pid")
     {
         params["kp"] = $('[name="slider-kp"]').val()
         params["ki"] = $('[name="slider-ki"]').val()
         params["kd"] = $('[name="slider-kd"]').val()
+    } else
+    {
+    	params["hyst"] = $('[name="slider-hyst"]').val()
     }
+
     let queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
     var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + queryString;
     console.log(queryString)
@@ -204,9 +246,16 @@ var run = function(e){
 	pid_controller.k_i = pid_constants.ki;
 	pid_controller.k_p = pid_constants.kp;
 	pid_controller.k_d = pid_constants.kd;
+
+	console.log("hyst is "+getHysteresis());
+	bang_bang_controller.setHysteresis(getHysteresis());
+	// currentScenario.room_temperature = getRoomTemp();
 	// console.log(currentController);
-	var data = currentScenario.run(getModel()['boiler'], currentController, TIME_STEP);//XXX this is wrong
-    // generateQueryString();
+	let model = getModel()
+	model["boiler"]["volume"] = getVolume()
+	model["boiler"]["power"] = getPower()
+	var data = currentScenario.run(model['boiler'], currentController, TIME_STEP);//XXX this is wrong
+    generateQueryString();
 	var i=0;
 	setupChart(data, currentScenario.events);
 	var kpis = calculateKPIs(data);

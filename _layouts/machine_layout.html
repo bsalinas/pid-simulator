@@ -84,20 +84,42 @@ script: machine.js
 				<p>
 				"Bang Bang" Controls look only at the current temperature and the setpoint. If the temperature is below the setpoint, the heater turns on. If the temperature is above the setpoint, it turns off.
 				</p>
+				<form>
+					<div data-role="fieldcontain">
+						<label for="slider-hyst">Hysteresis (°C):</label>
+						<input type="range" name="slider-hyst" class="pid-slider" id="slider-hyst" min="0" max="5" step="0.1" value="0"/>
+					</div>
+				</form>
 			</div>
 			<div id="pid">
 				<form>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Proportional:</label>
-						<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="50" step="0.01" value="0.1">
+						<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="50" step="0.01" value="0.1"/>
 					</div>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Integral:</label>
-						<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="10" step=".0001" value="0.0">
+						<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="10" step=".0001" value="0.0"/>
 					</div>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Derivative:</label>
-						<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="50" step="0.5" value="0">
+						<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="50" step="0.5" value="0"/>
+					</div>
+				</form>
+			</div>
+			<div id="params">
+				<form>
+					<div data-role="fieldcontain">
+						<label for="slider-room-temp">Room Temperature(°C):</label>
+						<input type="range" name="slider-room-temp" class="pid-slider" id="slider-room-temp" min="0" max="40" step="1" value="20"/>
+					</div>
+					<div data-role="fieldcontain">
+						<label for="slider-volume">Water Volume (L):</label>
+						<input type="range" name="slider-volume" class="pid-slider" id="slider-volume" min="0" max="20" step="0.1" value="3"/>
+					</div>
+					<div data-role="fieldcontain">
+						<label for="slider-power">Heater Power(W):</label>
+						<input type="range" name="slider-power" class="pid-slider" id="slider-power" min="0" max="10000" step="100" value="2000"/>
 					</div>
 				</form>
 			</div>
@@ -109,7 +131,7 @@ script: machine.js
 
 	<div data-role="footer">
 		<h6><a href="http://luminairecoffee.com/">Made by Luminaire</a></h6>
-        <!-- <h6><a id="deep_link" href="{{site.baseurl}}{{page.url}}">Link to This Page</a></h6> -->
+        <h6><a id="deep_link" href="{{site.baseurl}}{{page.url}}">Link to This Page</a></h6>
 	</div><!-- /footer -->
 
 </div><!-- /page -->

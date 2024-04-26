@@ -44,9 +44,10 @@ Simulator.prototype.run= function(boiler, ctrl, controls_time_step){
 		// c = 4.186 Joules/ gram
 		// Q = duty * heater_watts * timestep(s) (should be in joules)
 		if(this.state.time == 0 || (this.state.time - this.last_controls_time) >= controls_time_step){
-            let new_duty_cycle = ctrl.update(this.state.temperature);
+            let new_duty_cycle = ctrl.update(this.state.temperature, this.state);
             new_duty_cycle = Math.max(0,new_duty_cycle);
             new_duty_cycle = Math.min(1,new_duty_cycle);
+            this.state.heater_duty_cycle = new_duty_cycle;
             this.last_heater_duty_cycle = this.heater_duty_cycle_pending.shift()
             this.heater_duty_cycle_pending.push(new_duty_cycle);
 			// this.last_heater_duty_cycle = 
@@ -58,7 +59,7 @@ Simulator.prototype.run= function(boiler, ctrl, controls_time_step){
 		//dQ/dt = h*A(T(t) - T_env)
 		var cooling = h * surface_area*(this.state.temperature-this.room_temperature);
 		var dT = (this.last_heater_duty_cycle * heater_size - cooling) * this.time_step / (boiler_size * 1000 * 4.186);
-		
+		this.state.cooling = cooling
 		
 
 		var toAdd = 0.0;
@@ -72,7 +73,7 @@ Simulator.prototype.run= function(boiler, ctrl, controls_time_step){
 
 		this.state.temperature = this.state.temperature + dT;
 		this.state.time = this.state.time + this.time_step;
-		toRet.push({time:this.state.time, temperature:this.state.temperature, heater_duty_cycle:this.last_heater_duty_cycle});
+		toRet.push({...this.state});
 	}
 	return toRet;
 }

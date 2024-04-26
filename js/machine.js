@@ -1,5 +1,5 @@
 var startFromCold, brewing;
-var TIME_STEP = 0.1
+var TIME_STEP = 0.5
 var pid_controller = new PIDController(1,1,1, TIME_STEP);
 var currentScenario = false;
 var bang_bang_controller = new BangBangController();
@@ -51,6 +51,10 @@ function parseQueryString(params)
     {
     	$('[name="slider-volume"]').val(params["volume"]);
     }
+    if(params["delay"])
+    {
+    	$('[name="slider-delay"]').val(params["delay"]);
+    }
 }
 $(document).ready( function (e){
 
@@ -98,6 +102,7 @@ $(document).ready( function (e){
 });
 var svg, line;
 
+<<<<<<< HEAD
 function setupChart(data,events)
 {
 	let subsample = data.filter(function(value, index, Arr){
@@ -229,7 +234,13 @@ function setupChart(data,events)
 // 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 // 	    // .attr("width", width + margin.left + margin.right)
 // 	    // .attr("height", height + margin.top + margin.bottom)
-	  
+// function setupChart(data, events){
+// 	console.log(data)
+// 	// var temperatures = {
+// 	// 	x:[]
+// 	// }
+// }
+
 
 
 // 	var width = $('svg.chart').width() - margin.left - margin.right,
@@ -333,6 +344,9 @@ function getPower(){
 function getVolume(){
 	return parseFloat($('[name="slider-volume"]').val());
 }
+function getTimeDelay(){
+	return parseFloat($('[name="slider-delay"]').val());
+}
 function generateQueryString()
 {
     console.log("generateQueryString")
@@ -343,7 +357,8 @@ function generateQueryString()
         "sim":sim,
         "room_temp":getRoomTemp(),
         "volume":getVolume(),
-        "power":getPower()
+        "power":getPower(),
+        "delay":getTimeDelay()
     }
     if(sim == "pid")
     {
@@ -390,6 +405,10 @@ var run = function(e){
 	let model = getModel()
 	model["boiler"]["volume"] = getVolume()
 	model["boiler"]["power"] = getPower()
+
+	var c_per_min = (getPower())/(getVolume()*1000*4.186)*60;
+	$('#heater_power_descriptor').text("Heater Power(W): ~"+Number(c_per_min).toFixed(1)+"°C/min");
+	currentScenario.setTimeDelay(getTimeDelay());
 	var data = currentScenario.run(model['boiler'], currentController, TIME_STEP);//XXX this is wrong
     generateQueryString();
 	var i=0;
@@ -444,7 +463,7 @@ var calculateKPIs = function(data){
 				hasReachedTemp = true;
 			}
 		} else {
-			if(Math.abs(data[i].temperature - currentScenario.target_temperature) < 2.5){
+			if(Math.abs(data[i].temperature - currentScenario.target_temperature) < 5){
 				inRangeCount++;
 			}
 			else{

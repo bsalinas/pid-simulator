@@ -9,12 +9,14 @@ window.Simulator = function(opts, events){
 	this.start_temperature = opts.start_temperature || 85;
 	this.target_temperature = opts.target_temperature || 95;
 	this.room_temperature = opts.room_temperature || 20;//Celsius
+	this.time_delay = opts.time_delay || 10;
 	this.events = events;
 	this.last_controls_time = 0;
 	this.last_heater_duty_cycle = 0;
     this.heater_duty_cycle_pending = []
+    this.last_calculated_heater_duty_cycle = 0
     // let n_delay = parseInt(1.0/this.time_step)
-    let n_delay = 100
+    let n_delay = parseInt(this.time_delay/this.time_step)
     for(let i=0; i<n_delay; i++)
     {
         this.heater_duty_cycle_pending.push(0.0)
@@ -22,7 +24,18 @@ window.Simulator = function(opts, events){
 
 	return this
 };
-
+Simulator.prototype.setTimeDelay = function(time_delay_s)
+{
+	this.heater_duty_cycle_pending = [];
+	this.time_delay = time_delay_s;
+	console.log("time delay is ",this.time_delay)
+	let n_delay = parseInt(this.time_delay/this.time_step)
+	if(n_delay < 1) n_delay = 1
+    for(let i=0; i<n_delay; i++)
+    {
+        this.heater_duty_cycle_pending.push(0.0)
+    }
+}
 Simulator.prototype.run= function(boiler, ctrl, controls_time_step){
 	var boiler_size = boiler['volume'];
 	var heater_size = boiler['power'];

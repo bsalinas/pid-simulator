@@ -102,21 +102,20 @@ $(document).ready( function (e){
 });
 var svg, line;
 
-<<<<<<< HEAD
 function setupChart(data,events)
 {
 	let subsample = data.filter(function(value, index, Arr){
-		return index%20 == 0;
+		return index%10 == 0;
 	});
 	var layout = {
 		autosize: true,
-  		height: 300
+  		height: 600
 	};
 	var temperature_trace = {
 	  y: subsample.map((x) => x.temperature),
 	  x: subsample.map((x) => x.time),
 	  name:"Temperature",
-	  mode: 'markers',
+	  mode: 'lines+markers',
 	  type:"scatter",
 	  yaxis:'y2',
 	  marker: {
@@ -124,6 +123,9 @@ function setupChart(data,events)
 	    color: subsample.map((x) => x.heater_duty_cycle),
 	    colorscale: [[0, 'rgb(200,200,200)'],[0.1, 'rgb(50,0,0)'],  [1, 'rgb(255,0,0)']],
 	    line:{width:0}
+	  },
+	  line:{
+	  	width:2
 	  },
 	  text: subsample.map((x)=> Number(x.temperature).toFixed(1)+"°C, "+Number(x.heater_duty_cycle*100).toFixed(1)+" %"),
 	  hoverlabel:{bgcolor:"#FFFFFF", font:{color:"#000"}}
@@ -138,7 +140,7 @@ function setupChart(data,events)
 		name:"Setpoint",
 		yaxis:'y2',
 		marker:{
-			size:2,
+			size:5,
 			color:"#888"
 		}
 	}
@@ -217,10 +219,21 @@ function setupChart(data,events)
 				side:"left",
 				overlaying:"y",
 				range:[90,100]
-			}
-  			// height: 400
+			},
+			showlegend: true,
+			  legend: {
+			    x: 0.5,
+			    orientation:"h",
+			    xanchor: 'center',
+			    y: -0.1
+			  },
+  			height: 600
   		}
 		Plotly.newPlot('pid-chart-wrapper',bar_traces, bar_layout)
+	} else
+	{
+		var allTraces = [setpoint_trace, temperature_trace];
+		Plotly.newPlot('pid-chart-wrapper', allTraces, layout);
 	}
 
 }

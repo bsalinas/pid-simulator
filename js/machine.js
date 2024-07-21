@@ -212,7 +212,8 @@ function setupChart(data,events)
 			autosize: true,
 			yaxis1:{
 				title:"PID Contribution",
-				side:"right"	
+				side:"right",
+				range:[0,1]	
 			},
 			yaxis2:{
 				title:"Temperature",

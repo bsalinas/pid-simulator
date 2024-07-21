@@ -24,13 +24,33 @@ PIDController.prototype.setConstants = function(constants){
   this.k_i = constants.ki;
   this.k_d = constants.kd;
 }
-PIDController.prototype.update = function(current_value) {
+PIDController.prototype.update = function(current_value, state) {
   this.current_value = current_value;
+  state.target = this.target;
 
   var error = (this.target - this.current_value);
   this.sumError = this.sumError + (error*this.time_step);
   var dError = (error - this.lastError)/this.time_step;
+  // var dError = (this.lastError - error)/this.time_step;
   this.lastError = error;
 
-  return (this.k_p*error) + (this.k_i * this.sumError) + (this.k_d * dError);
+  if(this.k_i > 0)
+  {
+    if(this.sumError > 1/this.k_i) this.sumError = 1/this.k_i;
+    if(this.sumError < -1/this.k_i) this.sumError = -1/this.k_i;
+  }
+
+  let p = (this.k_p*error);
+  let i = (this.k_i * this.sumError);
+  let d = (this.k_d * dError);
+  if(this.lastTime == 0)
+  {
+    d = 0.0
+  }
+  this.lastTime = 1;
+  state["p"]=p
+  state["i"]=i
+  state["d"]=d
+
+  return p + i + d; 
 };

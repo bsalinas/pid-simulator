@@ -38,7 +38,9 @@ script: machine.js
 				<label for="radio-cold">Start From Cold</label>
 			</fieldset>
 		</form> -->
-		<div class="chart-wrapper">
+		<div id="chart-wrapper" class="chart-wrapper">
+		</div>
+		<div id="pid-chart-wrapper">
 		</div>
 		<div class="stats" data-role="controlgroup" data-type="horizontal">
 			<a href="#overlay-rise-time" data-rel="popup" id="riseTime" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
@@ -81,35 +83,64 @@ script: machine.js
 				</ul>
 			</div>
 			<div id="bang_bang" class="ui-body-d ui-content">
+				<h3>Bang-Bang Parameters</h3>
 				<p>
 				"Bang Bang" Controls look only at the current temperature and the setpoint. If the temperature is below the setpoint, the heater turns on. If the temperature is above the setpoint, it turns off.
 				</p>
+				<form>
+					<div data-role="fieldcontain">
+						<label for="slider-hyst">Hysteresis (°C):</label>
+						<input type="range" name="slider-hyst" class="pid-slider" id="slider-hyst" min="0" max="5" step="0.1" value="0"/>
+					</div>
+				</form>
 			</div>
 			<div id="pid">
+				<h3>PID Parameters</h3>
 				<form>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Proportional:</label>
-						<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="50" step="0.01" value="0.1">
+						<input type="range" name="slider-kp" class="pid-slider" id="slider-kp" min="0" max="50" step="0.01" value="0.1"/>
 					</div>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Integral:</label>
-						<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="10" step=".0001" value="0.0">
+						<input type="range" name="slider-ki" class="pid-slider" id="slider-ki" min="0" max="10" step=".0001" value="0.0"/>
 					</div>
 					<div data-role="fieldcontain">
 						<label for="slider-kp">Derivative:</label>
-						<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="50" step="0.5" value="0">
+						<input type="range" name="slider-kd" class="pid-slider" id="slider-kd" min="0" max="50" step="0.5" value="0"/>
+					</div>
+				</form>
+			</div>
+			<div id="params">
+				<h3>Scenario Parameters</h3>
+				<form>
+					<div data-role="fieldcontain">
+						<label for="slider-room-temp">Room Temperature(°C):</label>
+						<input type="range" name="slider-room-temp" class="pid-slider" id="slider-room-temp" min="0" max="40" step="1" value="20"/>
+					</div>
+					<div data-role="fieldcontain">
+						<label for="slider-volume">Water Volume (L):</label>
+						<input type="range" name="slider-volume" class="pid-slider" id="slider-volume" min="0" max="20" step="0.1" value="3"/>
+					</div>
+					<div data-role="fieldcontain">
+						<label id="heater_power_descriptor" for="slider-power">Heater Power(W):</label>
+						<input type="range" name="slider-power" class="pid-slider" id="slider-power" min="0" max="10000" step="100" value="2000"/>
+					</div>
+					<div data-role="fieldcontain">
+						<label for="slider-delay">Time Delay(s):</label>
+						<input type="range" name="slider-delay" class="pid-slider" id="slider-delay" min="0" max="60" step="0.5" value="5"/>
 					</div>
 				</form>
 			</div>
 		</div>
-		
+		<a href="#" id="download_button" download="sim.csv">Download Sim</a>
 		
 		
 	</div><!-- /content -->
 
 	<div data-role="footer">
 		<h6><a href="http://luminairecoffee.com/">Made by Luminaire</a></h6>
-        <!-- <h6><a id="deep_link" href="{{site.baseurl}}{{page.url}}">Link to This Page</a></h6> -->
+        <h6><a id="deep_link" href="{{site.baseurl}}{{page.url}}">Link to This Page</a></h6>
 	</div><!-- /footer -->
 
 </div><!-- /page -->

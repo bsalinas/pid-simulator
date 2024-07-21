@@ -62,7 +62,7 @@ $(document).ready( function (e){
 		return (-2/60.0)*timestep;
 	};
 	brewing = new Simulator({room_temperature:getRoomTemp(), time_step:TIME_STEP,sim_length:30*60, start_temperature:94}, [{start:80,stop:110,run:shot},{start:95,stop:125,run:shot}, {start:150,stop:180, run:shot},{start:330,stop:430, run:shot},{start:530,stop:730, run:shot}]);
-	startFromCold = new Simulator({room_temperature:getRoomTemp(), time_step:TIME_STEP,sim_length:60*60, start_temperature:85}, []);
+	startFromCold = new Simulator({room_temperature:getRoomTemp(), time_step:TIME_STEP,sim_length:60*60, start_temperature:90}, []);
 	
 	$('a[data-scenario]').click(function(e){
 		if($(this).attr('data-scenario') === 'brewing'){
@@ -102,104 +102,241 @@ $(document).ready( function (e){
 });
 var svg, line;
 
+function setupChart(data,events)
+{
+	let subsample = data.filter(function(value, index, Arr){
+		return index%10 == 0;
+	});
+	var layout = {
+		autosize: true,
+  		height: 600
+	};
+	var temperature_trace = {
+	  y: subsample.map((x) => x.temperature),
+	  x: subsample.map((x) => x.time),
+	  name:"Temperature",
+	  mode: 'lines+markers',
+	  type:"scatter",
+	  yaxis:'y2',
+	  marker: {
+	    size: subsample.map((x) => x.heater_duty_cycle > 0 ? 7 : 8),
+	    color: subsample.map((x) => x.heater_duty_cycle),
+	    colorscale: [[0, 'rgb(200,200,200)'],[0.1, 'rgb(50,0,0)'],  [1, 'rgb(255,0,0)']],
+	    line:{width:0}
+	  },
+	  line:{
+	  	width:2
+	  },
+	  text: subsample.map((x)=> Number(x.temperature).toFixed(1)+"°C, "+Number(x.heater_duty_cycle*100).toFixed(1)+" %"),
+	  hoverlabel:{bgcolor:"#FFFFFF", font:{color:"#000"}}
+
+
+	};
+	var setpoint_trace = {
+		y:subsample.map((x)=>x.target),
+		x: subsample.map((x) => x.time),
+		mode: 'markers',
+		type:"scatter",
+		name:"Setpoint",
+		yaxis:'y2',
+		marker:{
+			size:5,
+			color:"#888"
+		}
+	}
+	console.log(setpoint_trace)
+
+	// var allTraces = [setpoint_trace, temperature_trace];
+	// Plotly.newPlot('chart-wrapper', allTraces, layout);
+
+	// if("p" in subsample[0])
+	// {
+	// 	//pid
+	// 	let heatmap = {
+	// 		x: subsample.map((x) => x.time),
+	// 		z: [subsample.map((x)=>x.p+x.i+x.d),subsample.map((x)=>x.p),subsample.map((x)=>x.i),subsample.map((x)=>x.d)],
+	// 		y: ["All","P","I","D"],
+	// 		type: 'heatmap',
+	// 		colorscale:[[0,'rgb(0,0,255)'],[0.5,'rgb(255,255,255)'],[1,'rgb(255,0,0)']],
+	// 		zmin:-1,
+	// 		zmax:1
+
+	// 	}
+	// 	console.log(heatmap)
+	// 	Plotly.newPlot('pid-chart-wrapper',[heatmap])
+	// }
+
+	if("p" in subsample[0])
+	{
+		//pid
+		let bar_p = {
+			x: subsample.map((x) => x.time),
+			y: subsample.map((x)=>x.p),
+			yaxis:'y1',
+			name: "P",
+			type:"bar",
+			marker:{
+				color:"#c1e7ff",
+				opacity:0.5,
+				line:{
+					width:0
+				}
+			}
+		}
+		let bar_i = {
+			x: subsample.map((x) => x.time),
+			y: subsample.map((x)=>x.i),
+			yaxis:'y1',
+			name: "I",
+			type:"bar",
+			marker:{
+				color:"#488f31",
+				opacity:0.2,
+				line:{
+					width:0
+				}
+			}
+		}
+		let bar_d = {
+			x: subsample.map((x) => x.time),
+			y: subsample.map((x)=>x.d),
+			yaxis:'y1',
+			name: "D",
+			type:"bar"
+			// mode: 'markers',
+			// type:"scatter"
+		}
+		let bar_traces = [bar_d, bar_i, bar_p, temperature_trace, setpoint_trace]
+		let bar_layout = {
+			barmode:"stack",
+			autosize: true,
+			yaxis1:{
+				title:"PID Contribution",
+				side:"right",
+				range:[0,1]	
+			},
+			yaxis2:{
+				title:"Temperature",
+				side:"left",
+				overlaying:"y",
+				range:[90,100]
+			},
+			showlegend: true,
+			  legend: {
+			    x: 0.5,
+			    orientation:"h",
+			    xanchor: 'center',
+			    y: -0.1
+			  },
+  			height: 600
+  		}
+		Plotly.newPlot('pid-chart-wrapper',bar_traces, bar_layout)
+	} else
+	{
+		var allTraces = [setpoint_trace, temperature_trace];
+		Plotly.newPlot('pid-chart-wrapper', allTraces, layout);
+	}
+
+}
+
+// function setupChart(data, events){
+
+// 	var margin = {top: 20, right: 20, bottom: 30, left: 50};
+// 	$('svg.chart').remove();
+// 	svg = d3.select(".chart-wrapper").append('svg').attr('class','chart')
+// 		.append("g")
+// 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// 	    // .attr("width", width + margin.left + margin.right)
+// 	    // .attr("height", height + margin.top + margin.bottom)
 // function setupChart(data, events){
 // 	console.log(data)
 // 	// var temperatures = {
 // 	// 	x:[]
 // 	// }
 // }
-function setupChart(data, events){
-	console.log(events)
-	var margin = {top: 20, right: 20, bottom: 30, left: 50};
-	$('svg.chart').remove();
-	svg = d3.select(".chart-wrapper").append('svg').attr('class','chart')
-		.append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	    // .attr("width", width + margin.left + margin.right)
-	    // .attr("height", height + margin.top + margin.bottom)
-	  
 
 
-	var width = $('svg.chart').width() - margin.left - margin.right,
-	    height = $('svg.chart').height() - margin.top - margin.bottom;
+
+// 	var width = $('svg.chart').width() - margin.left - margin.right,
+// 	    height = $('svg.chart').height() - margin.top - margin.bottom;
 
 
-	var x = d3.scale.linear()
-	    .range([0, width]);
+// 	var x = d3.scale.linear()
+// 	    .range([0, width]);
 
-	var y = d3.scale.linear()
-	    .range([height, 0]);
+// 	var y = d3.scale.linear()
+// 	    .range([height, 0]);
 
-	var xAxis = d3.svg.axis().ticks(5)
-	    .scale(x)
-	    .orient("bottom");
+// 	var xAxis = d3.svg.axis().ticks(5)
+// 	    .scale(x)
+// 	    .orient("bottom");
 
-	var yAxis = d3.svg.axis().ticks(3)
-	    .scale(y)
-	    .orient("left");
+// 	var yAxis = d3.svg.axis().ticks(3)
+// 	    .scale(y)
+// 	    .orient("left");
 
-	line = d3.svg.line()
-	    .x(function(d) { return x(d.time/60); })
-	    .y(function(d) {return y(d.temperature); });
-	  var y_extent = d3.extent(data, function(d){return d.temperature;})
-	  x.domain(d3.extent(data, function(d){return d.time/60;}));
-	  y.domain([Math.min(y_extent[0],92), Math.max(y_extent[1],97)]);
-	  console.log(x);
+// 	line = d3.svg.line()
+// 	    .x(function(d) { return x(d.time/60); })
+// 	    .y(function(d) {return y(d.temperature); });
+// 	  var y_extent = d3.extent(data, function(d){return d.temperature;})
+// 	  x.domain(d3.extent(data, function(d){return d.time/60;}));
+// 	  y.domain([Math.min(y_extent[0],92), Math.max(y_extent[1],97)]);
+// 	  console.log(x);
 
-	  svg.selectAll('rect.shot').data(events)
-	  	.enter().append('rect')
-	  	.attr("class","shot")
-	  	.attr('x',function(d){
-	  		console.log(d);
-	  		return x(d.start/60)
-	  	})
-	  	.attr('y',y(y.domain()[1]))
-	  	.attr('width',function(d){
-	  		return x(d.stop/60)-x(d.start/60);
-	  	})
-	  	.attr('height',y(y.domain()[0]) - y(y.domain()[1]));
+// 	  svg.selectAll('rect.shot').data(events)
+// 	  	.enter().append('rect')
+// 	  	.attr("class","shot")
+// 	  	.attr('x',function(d){
+// 	  		console.log(d);
+// 	  		return x(d.start/60)
+// 	  	})
+// 	  	.attr('y',y(y.domain()[1]))
+// 	  	.attr('width',function(d){
+// 	  		return x(d.stop/60)-x(d.start/60);
+// 	  	})
+// 	  	.attr('height',y(y.domain()[0]) - y(y.domain()[1]));
 
-	  svg.append("g")
-	      .attr("class", "x axis")
-	      .attr("transform", "translate(0," + height + ")")
-	      .call(xAxis);
+// 	  svg.append("g")
+// 	      .attr("class", "x axis")
+// 	      .attr("transform", "translate(0," + height + ")")
+// 	      .call(xAxis);
 
-	  svg.append("g")
-	      .attr("class", "y axis")
-	      .call(yAxis)
-	    .append("text")
-	      .attr("transform", "rotate(-90)")
-	      .attr("y", 3)
-	      .attr("dy", "-2.5em")
-	      .style("text-anchor", "end")
-	      .text("Temperature");
-	  svg.append("rect")
-	  	.attr('class','target')
-	  	.attr('x',x(0)+2)
-	  	.attr('y',y(95.5))
-	  	.attr('width', (x(1800) - x(0)))
-	  	.attr('height', y(94.5)-y(95.5))
+// 	  svg.append("g")
+// 	      .attr("class", "y axis")
+// 	      .call(yAxis)
+// 	    .append("text")
+// 	      .attr("transform", "rotate(-90)")
+// 	      .attr("y", 3)
+// 	      .attr("dy", "-2.5em")
+// 	      .style("text-anchor", "end")
+// 	      .text("Temperature");
+// 	  svg.append("rect")
+// 	  	.attr('class','target')
+// 	  	.attr('x',x(0)+2)
+// 	  	.attr('y',y(95.5))
+// 	  	.attr('width', (x(1800) - x(0)))
+// 	  	.attr('height', y(94.5)-y(95.5))
 
 	  
 
-	var pathTween = function() {
-        var interpolate = d3.scale.quantile()
-                .domain([0,1])
-                .range(d3.range(1, data.length + 1));
-        return function(t) {
-            return line(data.slice(0, interpolate(t)));
-        };
-    }
-	  svg.selectAll('path.line').data([data]).enter()
-	    .append("path")
-	    .attr("class", "line")
-	    .attr("d", line(data[0]))
-	    .transition().duration(1000).attrTween('d',pathTween);
+// 	var pathTween = function() {
+//         var interpolate = d3.scale.quantile()
+//                 .domain([0,1])
+//                 .range(d3.range(1, data.length + 1));
+//         return function(t) {
+//             return line(data.slice(0, interpolate(t)));
+//         };
+//     }
+// 	  svg.selectAll('path.line').data([data]).enter()
+// 	    .append("path")
+// 	    .attr("class", "line")
+// 	    .attr("d", line(data[0]))
+// 	    .transition().duration(1000).attrTween('d',pathTween);
 	    
     
     
 
-}
+// }
 
 
 function getConstants(){
@@ -254,6 +391,20 @@ function generateQueryString()
     // window.history.replaceState(null,null,newurl);
     $('#deep_link').attr("href",newurl);
 }
+function jsonToCsv(items) {
+  const header = Object.keys(items[0]);
+  const headerString = header.join(',');
+  // handle null or undefined values here
+  const replacer = (key, value) => value ?? '';
+  const rowItems = items.map((row) =>
+    header
+      .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+      .join(',')
+  );
+  // join header and body, and break into separate lines
+  const csv = [headerString, ...rowItems].join('\r\n');
+  return csv;
+}
 var run = function(e){
     console.log("RUN!");
 	var pid_constants = getConstants();
@@ -302,6 +453,8 @@ var run = function(e){
 	
 	
 	$('#overshoot .stat').html(parseFloat(Math.round(kpis.peak_overshoot * 10) / 10).toFixed(1)+"&deg;C");
+	let text = jsonToCsv(data);
+	$('#download_button').attr("href","data:text/csv;charset=utf-8,"+text)
 }
 
 var calculateKPIs = function(data){

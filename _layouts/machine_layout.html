@@ -38,7 +38,9 @@ script: machine.js
 				<label for="radio-cold">Start From Cold</label>
 			</fieldset>
 		</form> -->
-		<div class="chart-wrapper">
+		<div id="chart-wrapper" class="chart-wrapper">
+		</div>
+		<div id="pid-chart-wrapper">
 		</div>
 		<div class="stats" data-role="controlgroup" data-type="horizontal">
 			<a href="#overlay-rise-time" data-rel="popup" id="riseTime" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">
@@ -131,7 +133,7 @@ script: machine.js
 				</form>
 			</div>
 		</div>
-		
+		<a href="#" id="download_button" download="sim.csv">Download Sim</a>
 		
 		
 	</div><!-- /content -->

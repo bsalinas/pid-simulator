@@ -16,9 +16,10 @@ BangBangController.prototype.reset = function()
 BangBangController.prototype.setHysteresis = function(hyst){
   this.hysteresis = hyst;
 }
-BangBangController.prototype.update = function(current_value) {
+BangBangController.prototype.update = function(current_value, state) {
   // console.log(current_value,this.target,this.last_was_on, this.hysteresis)
   this.current_value = current_value;
+  state.target = this.target;
   if(this.hysteresis > 0.0)
   {
       if(this.current_value >= this.target + this.hysteresis)

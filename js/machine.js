@@ -120,7 +120,8 @@ function setupChart(data,events)
 	  yaxis:'y2',
 	  marker: {
 	    size: subsample.map((x) => x.heater_duty_cycle > 0 ? 7 : 8),
-	    color: subsample.map((x) => x.heater_duty_cycle),
+	    color:"black",
+	    // color: subsample.map((x) => x.heater_duty_cycle),
 	    colorscale: [[0, 'rgb(200,200,200)'],[0.1, 'rgb(50,0,0)'],  [1, 'rgb(255,0,0)']],
 	    line:{width:0}
 	  },
@@ -176,8 +177,8 @@ function setupChart(data,events)
 			name: "P",
 			type:"bar",
 			marker:{
-				color:"#c1e7ff",
-				opacity:0.5,
+				color:"#4287f5",
+				opacity:0.7,
 				line:{
 					width:0
 				}
@@ -191,7 +192,7 @@ function setupChart(data,events)
 			type:"bar",
 			marker:{
 				color:"#488f31",
-				opacity:0.2,
+				opacity:0.7,
 				line:{
 					width:0
 				}
@@ -202,7 +203,14 @@ function setupChart(data,events)
 			y: subsample.map((x)=>x.d),
 			yaxis:'y1',
 			name: "D",
-			type:"bar"
+			type:"bar",
+			marker:{
+				color:"#f58d42",
+				opacity:0.7,
+				line:{
+					width:0
+				}
+			}
 			// mode: 'markers',
 			// type:"scatter"
 		}
